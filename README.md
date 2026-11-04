@@ -22,4 +22,4 @@ Demonstração de uso de:
 
 ## GitHub pages (demonstração):
 
-https://crisstanza.github.io/LabTest/
+https://crisstanza.github.io/Octocat-Labyrinth/
