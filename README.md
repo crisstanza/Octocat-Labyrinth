@@ -1,4 +1,4 @@
-# LabTest
+# Octocat's Labyrinth
 
 Demonstração de uso de:
 
@@ -7,7 +7,8 @@ Demonstração de uso de:
 - minificação de CSS e JavaScript;
 - vite;
 - configurações e snippets do VSCode;
-- cores em script bash; e
+- cores em script bash;
+- batch scripts (.bat); e
 - manipulação de janelas Mintty no Windows.
 
 ## Para rodar e desenvolver localmente:

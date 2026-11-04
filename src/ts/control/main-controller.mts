@@ -1,16 +1,14 @@
 import { CssClasses, EventKeys } from "../constants/constants.mjs";
 import { Player } from "../model/player.mjs";
 import { RandomUtils } from "../utils/random-utils.mjs";
-import { Utils } from "../utils/utils.mjs";
 
 export class MainController {
-  static readonly #ROWS = 16;
-  static readonly #COLUMNS = 24;
+  static readonly #ROWS = 24;
+  static readonly #COLUMNS = 32;
 
   static readonly #BORDERS = [CssClasses.TOP, CssClasses.RIGHT, CssClasses.BOTTOM, CssClasses.LEFT];
 
   readonly #randomUtils: RandomUtils = new RandomUtils();
-  readonly #utils: Utils = new Utils();
 
   #player: Player | null = null;
 
@@ -20,46 +18,11 @@ export class MainController {
       const row = table.insertRow(i);
       for (let j = 0; j < MainController.#COLUMNS; j++) {
         const cell = row.insertCell(j);
-        if (this.#isFirstRow(i)) {
-          cell.classList.add(CssClasses.TOP);
-        } else if (this.#isLastRow(i)) {
-          cell.classList.add(CssClasses.BOTTOM);
-        }
-        if (!this.#isFirstRow(i) && this.#isFirstColumn(j)) {
-          cell.classList.add(CssClasses.LEFT);
-        } else if (!this.#isLastRow(i) && this.#isLastColumn(j)) {
-          cell.classList.add(CssClasses.RIGHT);
-        }
-
-        if (this.#rand()) {
-          cell.classList.add(CssClasses.TOP);
-        }
-        if (this.#rand()) {
-          cell.classList.add(CssClasses.BOTTOM);
-        }
-        if (this.#rand() && !(this.#isFirstRow(i) && this.#isFirstColumn(j))) {
-          cell.classList.add(CssClasses.LEFT);
-        }
-        if (this.#rand() && !(this.#isLastRow(i) && this.#isLastColumn(j))) {
-          cell.classList.add(CssClasses.RIGHT);
-        }
-
-        if (this.#utils.containsAll(cell.classList, MainController.#BORDERS)) {
-          if (this.#rand()) {
-            cell.classList.remove(CssClasses.TOP);
-          }
-          if (this.#rand()) {
-            cell.classList.remove(CssClasses.RIGHT);
-          }
-          if (this.#rand()) {
-            cell.classList.remove(CssClasses.BOTTOM);
-          }
-          if (this.#rand()) {
-            cell.classList.remove(CssClasses.LEFT);
-          }
-        }
+        cell.classList.add(...MainController.#BORDERS);
       }
     }
+    this.#ensureAllCellsReachable(table);
+    this.#addAlternativePaths(table);
     table.rows[0].cells[0].classList.add(CssClasses.NO_LEFT);
     table.rows[MainController.#ROWS - 1].cells[MainController.#COLUMNS - 1].classList.add(CssClasses.NO_RIGHT);
     const lab = document.getElementById("lab");
@@ -69,6 +32,82 @@ export class MainController {
     }
     this.#player = new Player(table, 0, 0);
     this.#addListenners();
+  }
+
+  #ensureAllCellsReachable(table: HTMLTableElement): void {
+    const visited = new Set<number>();
+    const visit = (row: number, column: number): void => {
+      visited.add(row * MainController.#COLUMNS + column);
+      const neighbors = [
+        { row: row - 1, column },
+        { row, column: column + 1 },
+        { row: row + 1, column },
+        { row, column: column - 1 },
+      ].filter((neighbor) => neighbor.row >= 0 && neighbor.row < MainController.#ROWS && neighbor.column >= 0 && neighbor.column < MainController.#COLUMNS && !visited.has(neighbor.row * MainController.#COLUMNS + neighbor.column));
+
+      while (neighbors.length > 0) {
+        const index = this.#randomUtils.randBetween(0, neighbors.length - 1);
+        const [neighbor] = neighbors.splice(index, 1);
+        if (visited.has(neighbor.row * MainController.#COLUMNS + neighbor.column)) {
+          continue;
+        }
+        this.#removeWallsBetween(table, row, column, neighbor.row, neighbor.column);
+        visit(neighbor.row, neighbor.column);
+      }
+    };
+
+    visit(0, 0);
+  }
+
+  #addAlternativePaths(table: HTMLTableElement): void {
+    for (let row = 0; row < MainController.#ROWS; row++) {
+      for (let column = 0; column < MainController.#COLUMNS; column++) {
+        const cell = table.rows[row].cells[column];
+        if (column < MainController.#COLUMNS - 1 && cell.classList.contains(CssClasses.RIGHT) && this.#hasMultiplePassages(table, row, column) && this.#hasMultiplePassages(table, row, column + 1) && this.#randomUtils.randBetween(1, 5) === 1) {
+          this.#removeWallsBetween(table, row, column, row, column + 1);
+        }
+
+        if (row < MainController.#ROWS - 1 && cell.classList.contains(CssClasses.BOTTOM) && this.#hasMultiplePassages(table, row, column) && this.#hasMultiplePassages(table, row + 1, column) && this.#randomUtils.randBetween(1, 5) === 1) {
+          this.#removeWallsBetween(table, row, column, row + 1, column);
+        }
+      }
+    }
+  }
+
+  #hasMultiplePassages(table: HTMLTableElement, row: number, column: number): boolean {
+    const cell = table.rows[row].cells[column];
+    let passages = 0;
+    if (row > 0 && !cell.classList.contains(CssClasses.TOP)) {
+      passages++;
+    }
+    if (column < MainController.#COLUMNS - 1 && !cell.classList.contains(CssClasses.RIGHT)) {
+      passages++;
+    }
+    if (row < MainController.#ROWS - 1 && !cell.classList.contains(CssClasses.BOTTOM)) {
+      passages++;
+    }
+    if (column > 0 && !cell.classList.contains(CssClasses.LEFT)) {
+      passages++;
+    }
+    return passages > 1;
+  }
+
+  #removeWallsBetween(table: HTMLTableElement, row: number, column: number, nextRow: number, nextColumn: number): void {
+    const cell = table.rows[row].cells[column];
+    const nextCell = table.rows[nextRow].cells[nextColumn];
+    if (nextRow < row) {
+      cell.classList.remove(CssClasses.TOP);
+      nextCell.classList.remove(CssClasses.BOTTOM);
+    } else if (nextRow > row) {
+      cell.classList.remove(CssClasses.BOTTOM);
+      nextCell.classList.remove(CssClasses.TOP);
+    } else if (nextColumn < column) {
+      cell.classList.remove(CssClasses.LEFT);
+      nextCell.classList.remove(CssClasses.RIGHT);
+    } else {
+      cell.classList.remove(CssClasses.RIGHT);
+      nextCell.classList.remove(CssClasses.LEFT);
+    }
   }
 
   #addListenners(): void {
@@ -98,30 +137,5 @@ export class MainController {
           return;
       }
     }
-  }
-
-  #isFirstCell(i: number, j: number): boolean {
-    return this.#isFirstRow(i) && this.#isFirstColumn(j);
-  }
-  #isLastCell(i: number, j: number): boolean {
-    return this.#isLastRow(i) && this.#isLastColumn(j);
-  }
-
-  #isFirstRow(i: number): boolean {
-    return i == 0;
-  }
-  #isLastRow(i: number): boolean {
-    return i == MainController.#ROWS - 1;
-  }
-
-  #isFirstColumn(j: number): boolean {
-    return j == 0;
-  }
-  #isLastColumn(j: number): boolean {
-    return j == MainController.#COLUMNS - 1;
-  }
-
-  #rand(): boolean {
-    return this.#randomUtils.randBetween(1, 4) == 1;
   }
 }

@@ -8,7 +8,9 @@ footer {
     opacity: 0.5;
 }
 
-.github-icon:hover {
-    opacity: 0.75;
-    filter: drop-shadow(0 0 10px rgba(255, 255, 0, 0.75));
+.github-icon {
+    &:hover {
+        opacity: 0.75;
+        filter: drop-shadow(0 0 10px rgba(255, 255, 0, 0.75));
+    }
 }

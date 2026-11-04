@@ -25,46 +25,50 @@ table {
 	border-collapse: collapse;
 	background-color: azure;
 	box-shadow: 0px 0px 100px #999;
-}
 
-table tbody tr td {
-	width: var(--cell-size);
-	height: var(--cell-size);
-	border: var(--border-width) dotted #DDD;
-}
+	tbody {
+		tr {
+			td {
+				width: var(--cell-size);
+				height: var(--cell-size);
+				border: var(--border-width) dotted #DDD;
 
-table tbody tr td.top {
-	border-top: var(--border-width) var(--border-style) var(--border-color);
-}
+				&.top {
+					border-top: var(--border-width) var(--border-style) var(--border-color);
+				}
 
-table tbody tr td.right {
-	border-right: var(--border-width) var(--border-style) var(--border-color);
-}
+				&.right {
+					border-right: var(--border-width) var(--border-style) var(--border-color);
+				}
 
-table tbody tr td.bottom {
-	border-bottom: var(--border-width) var(--border-style) var(--border-color);
-}
+				&.bottom {
+					border-bottom: var(--border-width) var(--border-style) var(--border-color);
+				}
 
-table tbody tr td.left {
-	border-left: var(--border-width) var(--border-style) var(--border-color);
-}
+				&.left {
+					border-left: var(--border-width) var(--border-style) var(--border-color);
+				}
 
-table tbody tr td.no-right {
-	border-right: none;
-}
+				&.no-right {
+					border-right: none;
+				}
 
-table tbody tr td.no-left {
-	border-left: none;
-}
+				&.no-left {
+					border-left: none;
+				}
 
-table tbody tr td.player {
-	background-size: contain;
-	background-repeat: no-repeat;
-	background-position: center;
-	background-image: url(../img/octocat.png);
-	filter: drop-shadow(0 0 5px rgba(255, 0, 255, 0.25));
-}
+				&.player {
+					background-size: contain;
+					background-repeat: no-repeat;
+					background-position: center;
+					background-image: url(../img/octocat.png);
+					filter: drop-shadow(0 0 5px rgba(255, 0, 255, 0.25));
 
-table tbody tr td.player.flip {
-	transform: scaleX(-1);
+					&.flip {
+						transform: scaleX(-1);
+					}
+				}
+			}
+		}
+	}
 }
