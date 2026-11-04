@@ -12,12 +12,12 @@ Demonstração de uso de:
 
 ## Para rodar e desenvolver localmente:
 
-- execute o script `.run-dev.bat`.
+- execute o script `scripts/.run.bat`.
 
 ## Para gerar e testar um build localmente
 
-- execute o script `.build.bat` para gerar; e
-- execute o script `.run-build.bat` para testar.
+- execute o script `scripts/.build.bat` para gerar; e
+- execute o script `scripts/.run-build.bat` para testar.
 
 ## GitHub pages (demonstração):
 
