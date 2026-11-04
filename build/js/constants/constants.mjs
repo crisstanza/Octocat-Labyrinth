@@ -1,0 +1,1 @@
+const r={ArrowUp:"ArrowUp",ArrowRight:"ArrowRight",ArrowDown:"ArrowDown",ArrowLeft:"ArrowLeft"},o={TOP:"top",RIGHT:"right",BOTTOM:"bottom",LEFT:"left",NO_RIGHT:"no-right",NO_LEFT:"no-left",PLAYER:"player",FLIP:"flip"};export{o as CssClasses,r as EventKeys};
